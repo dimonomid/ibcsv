@@ -69,7 +69,11 @@ func (r *Reader) Read() (table *Table, err error) {
 			recs, err = r.csvReader.Read()
 			if err != nil {
 				if err == io.EOF {
-					return table, io.EOF
+					if table != nil {
+						return table, nil
+					}
+
+					return nil, io.EOF
 				}
 
 				return nil, err
