@@ -22,8 +22,25 @@ type Table struct {
 	Fields []string
 
 	// Rows is a slice of maps from the field name to the corresponding value.
-	Rows []map[string]string
+	Rows []Row
 }
+
+type Row struct {
+	Kind RowKind
+
+	// Values is a map from the field name (as in Table.Fields slice) to the
+	// corresponding value.
+	Values map[string]string
+}
+
+// RowKind represents the row kind as found in Interactive Broker CSV files.
+type RowKind string
+
+const (
+	RowKindData     RowKind = "data"
+	RowKindSubtotal RowKind = "subtotal"
+	RowKindTotal    RowKind = "total"
+)
 
 type Reader struct {
 	csvReader *csv.Reader
@@ -46,8 +63,6 @@ func (r *Reader) Read() (table *Table, err error) {
 	for {
 		recs := r.lastRecs
 		r.lastRecs = nil
-
-		//fmt.Println(recs)
 
 		if recs == nil {
 			var err error
@@ -74,11 +89,17 @@ func (r *Reader) Read() (table *Table, err error) {
 		tableName := recs[0]
 
 		var isHeader bool
+		var rowKind RowKind
+
 		switch recs[1] {
 		case "Header":
 			isHeader = true
 		case "Data":
-			// Leave it at false
+			rowKind = RowKindData
+		case "SubTotal":
+			rowKind = RowKindSubtotal
+		case "Total":
+			rowKind = RowKindTotal
 		default:
 			return nil, fmt.Errorf("%w: %s", ErrWrongKind, recs[1])
 		}
@@ -107,9 +128,12 @@ func (r *Reader) Read() (table *Table, err error) {
 		}
 
 		// Parsing table row
-		row := make(map[string]string, len(recs)-2)
+		row := Row{
+			Kind:   rowKind,
+			Values: make(map[string]string, len(recs)-2),
+		}
 		for i, v := range recs[2:] {
-			row[table.Fields[i]] = v
+			row.Values[table.Fields[i]] = v
 		}
 
 		table.Rows = append(table.Rows, row)

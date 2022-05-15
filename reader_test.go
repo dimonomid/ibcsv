@@ -20,7 +20,7 @@ type testReadRes struct {
 
 func TestReader(t *testing.T) {
 	testCases := []testCase{
-		testCase{comment: "normal data", // {{{
+		testCase{comment: "normal data, without totals or sutbotals", // {{{
 			data: `Statement,Header,Field Name,Field Value
 Statement,Data,BrokerName,Interactive Brokers Central Europe Zrt.
 Statement,Data,BrokerAddress,"Madach Imre ut 13-14, Floor 5, Budapest, 1075, Hungary"
@@ -43,26 +43,41 @@ Dividends,Data,Total,,,4543.28,
 					table: &Table{
 						Name:   "Statement",
 						Fields: []string{"Field Name", "Field Value"},
-						Rows: []map[string]string{
-							map[string]string{
-								"Field Name":  "BrokerName",
-								"Field Value": "Interactive Brokers Central Europe Zrt.",
+						Rows: []Row{
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Field Name":  "BrokerName",
+									"Field Value": "Interactive Brokers Central Europe Zrt.",
+								},
 							},
-							map[string]string{
-								"Field Name":  "BrokerAddress",
-								"Field Value": "Madach Imre ut 13-14, Floor 5, Budapest, 1075, Hungary",
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Field Name":  "BrokerAddress",
+									"Field Value": "Madach Imre ut 13-14, Floor 5, Budapest, 1075, Hungary",
+								},
 							},
-							map[string]string{
-								"Field Name":  "Title",
-								"Field Value": "Activity Statement",
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Field Name":  "Title",
+									"Field Value": "Activity Statement",
+								},
 							},
-							map[string]string{
-								"Field Name":  "Period",
-								"Field Value": "February 1, 2022 - February 28, 2022",
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Field Name":  "Period",
+									"Field Value": "February 1, 2022 - February 28, 2022",
+								},
 							},
-							map[string]string{
-								"Field Name":  "WhenGenerated",
-								"Field Value": "2022-02-15, 02:21:06 EDT",
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Field Name":  "WhenGenerated",
+									"Field Value": "2022-02-15, 02:21:06 EDT",
+								},
 							},
 						},
 					},
@@ -71,34 +86,46 @@ Dividends,Data,Total,,,4543.28,
 					table: &Table{
 						Name:   "Withholding Tax",
 						Fields: []string{"Currency", "Date", "Description", "Amount", "Code"},
-						Rows: []map[string]string{
-							map[string]string{
-								"Currency":    "USD",
-								"Date":        "2022-01-08",
-								"Description": "FOO(qweqwe) Cash Dividend USD 2.00 per Share - US Tax",
-								"Amount":      "-6",
-								"Code":        "",
+						Rows: []Row{
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Currency":    "USD",
+									"Date":        "2022-01-08",
+									"Description": "FOO(qweqwe) Cash Dividend USD 2.00 per Share - US Tax",
+									"Amount":      "-6",
+									"Code":        "",
+								},
 							},
-							map[string]string{
-								"Currency":    "USD",
-								"Date":        "2022-01-14",
-								"Description": "BAR(asdasd) Cash Dividend USD 1.188 per Share - CA Tax",
-								"Amount":      "-10.49",
-								"Code":        "",
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Currency":    "USD",
+									"Date":        "2022-01-14",
+									"Description": "BAR(asdasd) Cash Dividend USD 1.188 per Share - CA Tax",
+									"Amount":      "-10.49",
+									"Code":        "",
+								},
 							},
-							map[string]string{
-								"Currency":    "USD",
-								"Date":        "2022-01-14",
-								"Description": "BAZ(zxczxc) Cash Dividend USD 3.23 per Share - US Tax",
-								"Amount":      "-200.83",
-								"Code":        "",
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Currency":    "USD",
+									"Date":        "2022-01-14",
+									"Description": "BAZ(zxczxc) Cash Dividend USD 3.23 per Share - US Tax",
+									"Amount":      "-200.83",
+									"Code":        "",
+								},
 							},
-							map[string]string{
-								"Currency":    "Total",
-								"Date":        "",
-								"Description": "",
-								"Amount":      "-218.32",
-								"Code":        "",
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Currency":    "Total",
+									"Date":        "",
+									"Description": "",
+									"Amount":      "-218.32",
+									"Code":        "",
+								},
 							},
 						},
 					},
@@ -107,34 +134,46 @@ Dividends,Data,Total,,,4543.28,
 					table: &Table{
 						Name:   "Dividends",
 						Fields: []string{"Currency", "Date", "Description", "Amount", "Code"},
-						Rows: []map[string]string{
-							map[string]string{
-								"Currency":    "USD",
-								"Date":        "2022-01-08",
-								"Description": "FOO(qweqwe) Cash Dividend USD 2.00 per Share (Ordinary Dividend)",
-								"Amount":      "60",
-								"Code":        "",
+						Rows: []Row{
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Currency":    "USD",
+									"Date":        "2022-01-08",
+									"Description": "FOO(qweqwe) Cash Dividend USD 2.00 per Share (Ordinary Dividend)",
+									"Amount":      "60",
+									"Code":        "",
+								},
 							},
-							map[string]string{
-								"Currency":    "USD",
-								"Date":        "2022-01-14",
-								"Description": "BAR(asdasd) Cash Dividend USD 1.188 per Share (Ordinary Dividend)",
-								"Amount":      "69.98",
-								"Code":        "",
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Currency":    "USD",
+									"Date":        "2022-01-14",
+									"Description": "BAR(asdasd) Cash Dividend USD 1.188 per Share (Ordinary Dividend)",
+									"Amount":      "69.98",
+									"Code":        "",
+								},
 							},
-							map[string]string{
-								"Currency":    "USD",
-								"Date":        "2022-01-14",
-								"Description": "BAZ(zxczxc) Cash Dividend USD 3.23 per Share (Ordinary Dividend)",
-								"Amount":      "2008.3",
-								"Code":        "",
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Currency":    "USD",
+									"Date":        "2022-01-14",
+									"Description": "BAZ(zxczxc) Cash Dividend USD 3.23 per Share (Ordinary Dividend)",
+									"Amount":      "2008.3",
+									"Code":        "",
+								},
 							},
-							map[string]string{
-								"Currency":    "Total",
-								"Date":        "",
-								"Description": "",
-								"Amount":      "4543.28",
-								"Code":        "",
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Currency":    "Total",
+									"Date":        "",
+									"Description": "",
+									"Amount":      "4543.28",
+									"Code":        "",
+								},
 							},
 						},
 					},
@@ -170,26 +209,41 @@ Dividends,Data,Total,,,4543.28,
 					table: &Table{
 						Name:   "Statement",
 						Fields: []string{"Field Name", "Field Value"},
-						Rows: []map[string]string{
-							map[string]string{
-								"Field Name":  "BrokerName",
-								"Field Value": "Interactive Brokers Central Europe Zrt.",
+						Rows: []Row{
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Field Name":  "BrokerName",
+									"Field Value": "Interactive Brokers Central Europe Zrt.",
+								},
 							},
-							map[string]string{
-								"Field Name":  "BrokerAddress",
-								"Field Value": "Madach Imre ut 13-14, Floor 5, Budapest, 1075, Hungary",
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Field Name":  "BrokerAddress",
+									"Field Value": "Madach Imre ut 13-14, Floor 5, Budapest, 1075, Hungary",
+								},
 							},
-							map[string]string{
-								"Field Name":  "Title",
-								"Field Value": "Activity Statement",
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Field Name":  "Title",
+									"Field Value": "Activity Statement",
+								},
 							},
-							map[string]string{
-								"Field Name":  "Period",
-								"Field Value": "February 1, 2022 - February 28, 2022",
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Field Name":  "Period",
+									"Field Value": "February 1, 2022 - February 28, 2022",
+								},
 							},
-							map[string]string{
-								"Field Name":  "WhenGenerated",
-								"Field Value": "2022-02-15, 02:21:06 EDT",
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Field Name":  "WhenGenerated",
+									"Field Value": "2022-02-15, 02:21:06 EDT",
+								},
 							},
 						},
 					},
@@ -204,34 +258,125 @@ Dividends,Data,Total,,,4543.28,
 					table: &Table{
 						Name:   "Dividends",
 						Fields: []string{"Currency", "Date", "Description", "Amount", "Code"},
-						Rows: []map[string]string{
-							map[string]string{
-								"Currency":    "USD",
-								"Date":        "2022-01-08",
-								"Description": "FOO(qweqwe) Cash Dividend USD 2.00 per Share (Ordinary Dividend)",
-								"Amount":      "60",
-								"Code":        "",
+						Rows: []Row{
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Currency":    "USD",
+									"Date":        "2022-01-08",
+									"Description": "FOO(qweqwe) Cash Dividend USD 2.00 per Share (Ordinary Dividend)",
+									"Amount":      "60",
+									"Code":        "",
+								},
 							},
-							map[string]string{
-								"Currency":    "USD",
-								"Date":        "2022-01-14",
-								"Description": "BAR(asdasd) Cash Dividend USD 1.188 per Share (Ordinary Dividend)",
-								"Amount":      "69.98",
-								"Code":        "",
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Currency":    "USD",
+									"Date":        "2022-01-14",
+									"Description": "BAR(asdasd) Cash Dividend USD 1.188 per Share (Ordinary Dividend)",
+									"Amount":      "69.98",
+									"Code":        "",
+								},
 							},
-							map[string]string{
-								"Currency":    "USD",
-								"Date":        "2022-01-14",
-								"Description": "BAZ(zxczxc) Cash Dividend USD 3.23 per Share (Ordinary Dividend)",
-								"Amount":      "2008.3",
-								"Code":        "",
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Currency":    "USD",
+									"Date":        "2022-01-14",
+									"Description": "BAZ(zxczxc) Cash Dividend USD 3.23 per Share (Ordinary Dividend)",
+									"Amount":      "2008.3",
+									"Code":        "",
+								},
 							},
-							map[string]string{
-								"Currency":    "Total",
-								"Date":        "",
-								"Description": "",
-								"Amount":      "4543.28",
-								"Code":        "",
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"Currency":    "Total",
+									"Date":        "",
+									"Description": "",
+									"Amount":      "4543.28",
+									"Code":        "",
+								},
+							},
+						},
+					},
+					err: "EOF",
+				},
+			},
+		}, // }}}
+		testCase{comment: "table with subtotal and total", // {{{
+			data: `
+Trades,Header,One,Two,Three
+Trades,Data,Foo,1,1
+Trades,Data,Foo,3,1
+Trades,SubTotal,Foo,4,2
+Trades,Data,Bar,10,1
+Trades,Data,Bar,30,1
+Trades,SubTotal,Bar,40,2
+Trades,Total,,44,4
+`,
+			wantResults: []testReadRes{
+				testReadRes{
+					table: &Table{
+						Name:   "Trades",
+						Fields: []string{"One", "Two", "Three"},
+						Rows: []Row{
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"One":   "Foo",
+									"Two":   "1",
+									"Three": "1",
+								},
+							},
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"One":   "Foo",
+									"Two":   "3",
+									"Three": "1",
+								},
+							},
+							Row{
+								Kind: RowKindSubtotal,
+								Values: map[string]string{
+									"One":   "Foo",
+									"Two":   "4",
+									"Three": "2",
+								},
+							},
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"One":   "Bar",
+									"Two":   "10",
+									"Three": "1",
+								},
+							},
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"One":   "Bar",
+									"Two":   "30",
+									"Three": "1",
+								},
+							},
+							Row{
+								Kind: RowKindSubtotal,
+								Values: map[string]string{
+									"One":   "Bar",
+									"Two":   "40",
+									"Three": "2",
+								},
+							},
+							Row{
+								Kind: RowKindTotal,
+								Values: map[string]string{
+									"One":   "",
+									"Two":   "44",
+									"Three": "4",
+								},
 							},
 						},
 					},
@@ -258,8 +403,6 @@ Dividends,Data,Total,,,4543.28,
 				table: table,
 				err:   errString,
 			})
-
-			//fmt.Printf("%+v (%s)\n", table, err)
 
 			if err != nil {
 				break
