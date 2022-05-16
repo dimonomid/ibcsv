@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 )
 
 var (
@@ -87,6 +88,11 @@ func (r *Reader) Read() (table *Table, err error) {
 		}
 
 		tableName := recs[0]
+
+		// Strip the invisible FEFF unicode character if it's present.
+		// See this: https://www.freecodecamp.org/news/a-quick-tale-about-feff-the-invisible-character-cd25cd4630e7/
+		// And I did encounter CSV files downloaded from IBKR with this character present.
+		tableName = strings.Trim(tableName, "\ufeff")
 
 		var isHeader bool
 		var rowKind RowKind
