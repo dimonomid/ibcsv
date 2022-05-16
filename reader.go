@@ -80,10 +80,6 @@ func (r *Reader) Read() (table *Table, err error) {
 			}
 		}
 
-		if table == nil {
-			table = &Table{}
-		}
-
 		if len(recs) < 3 {
 			// Every line must contain at least the table name, then the "Header" or "Data",
 			// then at least one more data field; so having less than 3 fields means a bad data.
@@ -108,19 +104,19 @@ func (r *Reader) Read() (table *Table, err error) {
 			return nil, fmt.Errorf("%w: %s", ErrWrongKind, recs[1])
 		}
 
-		if tableName == table.Name && isHeader {
-			return nil, fmt.Errorf("%w: table %s", ErrUnexpectedHeader, tableName)
+		if isHeader && table != nil {
+			// A new table has started while we have the previous one to return
+			r.lastRecs = recs
+			return table, nil
+		}
+
+		if table == nil {
+			table = &Table{}
 		}
 
 		if tableName != table.Name {
 			if !isHeader {
 				return nil, fmt.Errorf("%w: table %s", ErrMissingHeader, tableName)
-			}
-
-			if table.Name != "" {
-				// A new table has started while we have the previous one to return
-				r.lastRecs = recs
-				return table, nil
 			}
 
 			// Started parsing table: remember field names

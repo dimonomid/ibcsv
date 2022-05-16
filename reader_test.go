@@ -310,8 +310,7 @@ Dividends,Data,Total,,,4543.28,
 			},
 		}, // }}}
 		testCase{comment: "table with subtotal and total", // {{{
-			data: `
-Trades,Header,One,Two,Three
+			data: `Trades,Header,One,Two,Three
 Trades,Data,Foo,1,1
 Trades,Data,Foo,3,1
 Trades,SubTotal,Foo,4,2
@@ -390,6 +389,87 @@ Trades,Total,,44,4
 				},
 			},
 		}, // }}}
+		testCase{comment: "repeating tables", // {{{
+			data: `
+Trades,Header,One,Two,Three
+Trades,Data,Foo,1,1
+Trades,Data,Foo,3,1
+Trades,Total,Foo,4,2
+Trades,Header,One,Two,Three
+Trades,Data,Bar,10,1
+Trades,Data,Bar,30,1
+Trades,Total,Bar,40,2
+`,
+			wantResults: []testReadRes{
+				testReadRes{
+					table: &Table{
+						Name:   "Trades",
+						Fields: []string{"One", "Two", "Three"},
+						Rows: []Row{
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"One":   "Foo",
+									"Two":   "1",
+									"Three": "1",
+								},
+							},
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"One":   "Foo",
+									"Two":   "3",
+									"Three": "1",
+								},
+							},
+							Row{
+								Kind: RowKindTotal,
+								Values: map[string]string{
+									"One":   "Foo",
+									"Two":   "4",
+									"Three": "2",
+								},
+							},
+						},
+					},
+				},
+				testReadRes{
+					table: &Table{
+						Name:   "Trades",
+						Fields: []string{"One", "Two", "Three"},
+						Rows: []Row{
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"One":   "Bar",
+									"Two":   "10",
+									"Three": "1",
+								},
+							},
+							Row{
+								Kind: RowKindData,
+								Values: map[string]string{
+									"One":   "Bar",
+									"Two":   "30",
+									"Three": "1",
+								},
+							},
+							Row{
+								Kind: RowKindTotal,
+								Values: map[string]string{
+									"One":   "Bar",
+									"Two":   "40",
+									"Three": "2",
+								},
+							},
+						},
+					},
+				},
+				testReadRes{
+					err: "EOF",
+				},
+			},
+		}, // }}}
 	}
 
 	for i, tc := range testCases {
@@ -399,7 +479,11 @@ Trades,Total,,44,4
 
 		var gotResults []testReadRes
 
-		for {
+		for j := 0; ; j++ {
+			if j >= 100 {
+				assert.FailNow(t, "too many iterations")
+			}
+
 			table, err := r.Read()
 			var errString string
 			if err != nil {
